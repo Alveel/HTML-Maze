@@ -7,7 +7,8 @@
 	<meta name="author" content="Min Zhu (Jony)" />
 	<title>MAZE GENERATOR & SOLVER</title>
 	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
-	<script src="jquery-1.9.1.js"></script>
+	<script src="jquery-3.6.0.js"></script>
+  <script src="jquery-migrate-1.4.1.js"></script>
 	<script>
 		// You can customize these parameters.
 		var _debug_ = false;
@@ -43,14 +44,39 @@
 		var final_path = [];
 
 		$(document).ready(function () {
+      maze_context = get_context();
+			maze_context.fillStyle = maze_cell_background_color;
+			generate_maze(maze_context);
+      draw_maze(maze_context);
+		});
+
+    function get_context() {
 			// Get Canvas Context
 			var maze_canvas = document.getElementById("maze_canvas");
 			maze_canvas.width = maze_cell_width * maze_col_count;
 			maze_canvas.height = maze_cell_height * maze_row_count;
 			var maze_context = maze_canvas.getContext("2d");
-			maze_context.fillStyle = maze_cell_background_color;
-			generate_maze(maze_context);
-		});
+      return maze_context;
+    }
+
+    function solve_and_draw() {
+      var maze_context = get_context();
+      solve_maze();
+      draw_maze(maze_context);
+    }
+
+    function reset_and_draw() {
+      cell_stack = [];
+      parsed_cells = [];
+      start_cell = undefined;
+      open_cells = [];
+      closed_cells = [];
+      path_cells = [];
+      final_path = [];
+      var maze_context = get_context();
+      generate_maze(maze_context);
+      draw_maze(maze_context);
+    }
 
 		function generate_maze(context) {
 			// Initiate Maze Cells with walls.
@@ -63,8 +89,8 @@
 			start_cell = { 'x': Math.floor(Math.random() * maze_col_count), 'y': Math.floor(Math.random() * maze_row_count) };
 			get_maze_cell(start_cell).v = visited;
 			generate_maze_cell(context, start_cell);
-			solve_maze();
-			draw_maze(context);
+			//solve_maze();
+			//draw_maze(context);
 		}
 
 		// Solve the maze with A* search.
@@ -375,5 +401,7 @@
 <body>
 	<canvas id="maze_canvas" width="600" height="400"></canvas>
 	<div id="div_message"></div>
+  <button type="button" id="solve" onclick="solve_and_draw()">Solve!</button>
+  <button type="button" id="reset" onclick="reset_and_draw()">Reset!</button>
 </body>
 </html>
